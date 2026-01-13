@@ -1,0 +1,50 @@
+name: Post News to X
+
+on:
+  schedule:
+    # Runs every 2 hours starting at 20:30 UTC (2:00 AM IST)
+    # IST is UTC+5:30, so 2:00 AM IST = 20:30 UTC (previous day)
+    # Schedule: 20:30, 22:30, 00:30, 02:30, 04:30, 06:30, 08:30, 10:30, 12:30, 14:30, 16:30, 18:30 UTC
+    - cron: '30 20,22 * * *'
+    - cron: '30 0,2,4,6,8,10,12,14,16,18 * * *'
+  workflow_dispatch:  # Allows manual trigger from Actions tab
+
+jobs:
+  post-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: pip install requests tweepy python-dotenv
+      
+      - name: Download history (if exists)
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: posted-history
+          path: .
+      
+      - name: Run news bot
+        env:
+          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: python news_bot.py
+      
+      - name: Upload history
+        uses: actions/upload-artifact@v4
+        with:
+          name: posted-history
+          path: posted_history.json
+          retention-days: 90
+          overwrite: true
