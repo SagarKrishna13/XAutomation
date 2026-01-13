@@ -2,13 +2,15 @@
 
 Automatically posts top 3 breaking news headlines to X (Twitter) every 2 hours using GitHub Actions.
 
-## Features
+**Live Repo:** https://github.com/pjob9456/XAutomation
 
-- ✅ Posts **1 combined tweet** with top 3 news headlines every 2 hours
-- ✅ Fetches from NewsData.io API
-- ✅ Duplicate detection (won't re-post same articles)
-- ✅ **X Free tier compliant**: Only 12 tweets/day (limit is 50)
-- ✅ **24/7 automation** via GitHub Actions (no laptop needed)
+## ✅ Features
+
+- Posts **1 combined tweet** with top 3 news headlines every 2 hours
+- Fetches from NewsData.io API
+- Duplicate detection (won't re-post same articles)
+- **X Free tier compliant**: Only 12 tweets/day (limit is 50)
+- **24/7 automation** via GitHub Actions (no laptop needed!)
 
 ## Tweet Format
 
@@ -22,37 +24,49 @@ Automatically posts top 3 breaking news headlines to X (Twitter) every 2 hours u
 
 ---
 
-## 🚀 GitHub Setup (24/7 Automation)
+## 📅 Schedule
 
-### Step 1: Push to GitHub
+The bot runs automatically every 2 hours starting at 2:00 AM IST:
 
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/XAutomation.git
-git branch -M main
-git push -u origin main
+| IST Time | UTC Time |
+|----------|----------|
+| 2:00 AM | 20:30 UTC |
+| 4:00 AM | 22:30 UTC |
+| 6:00 AM | 00:30 UTC |
+| 8:00 AM | 02:30 UTC |
+| 10:00 AM | 04:30 UTC |
+| 12:00 PM | 06:30 UTC |
+| 2:00 PM | 08:30 UTC |
+| 4:00 PM | 10:30 UTC |
+| 6:00 PM | 12:30 UTC |
+| 8:00 PM | 14:30 UTC |
+| 10:00 PM | 16:30 UTC |
+| 12:00 AM | 18:30 UTC |
+
+---
+
+## ⚙️ How to Change the Schedule
+
+Edit `.github/workflows/news_bot.yml` and modify the `cron` lines:
+
+```yaml
+on:
+  schedule:
+    - cron: '30 20,22 * * *'           # 2 AM and 4 AM IST
+    - cron: '30 0,2,4,6,8,10,12,14,16,18 * * *'  # Rest of the day
 ```
 
-### Step 2: Add Secrets
+**Cron format:** `minute hour day month weekday`
 
-1. Go to your repo → **Settings** → **Secrets and variables** → **Actions**
-2. Click **New repository secret** and add these 5 secrets:
+### Examples:
+| Schedule | Cron Expression |
+|----------|-----------------|
+| Every hour | `0 * * * *` |
+| Every 3 hours | `0 */3 * * *` |
+| Every 6 hours | `0 */6 * * *` |
+| Once daily at 9 AM IST | `30 3 * * *` |
 
-| Secret Name | Value |
-|-------------|-------|
-| `NEWSDATA_API_KEY` | `pub_b993b1572ec14b6b876078d0e0bf64e8` |
-| `X_API_KEY` | Your X API Key |
-| `X_API_SECRET` | Your X API Secret |
-| `X_ACCESS_TOKEN` | Your Access Token |
-| `X_ACCESS_SECRET` | Your Access Token Secret |
-
-### Step 3: Enable Workflow
-
-1. Go to **Actions** tab in your repo
-2. Click **"I understand my workflows, go ahead and enable them"**
-3. The bot will now run automatically every 2 hours!
+**IST to UTC:** Subtract 5 hours 30 minutes from IST time
 
 ---
 
@@ -60,11 +74,11 @@ git push -u origin main
 
 | Metric | Value |
 |--------|-------|
-| Tweets per run | **1** (single combined post) |
-| Runs per day | **12** (every 2 hours) |
+| Tweets per run | **1** |
+| Runs per day | **12** |
 | Total tweets/day | **12** |
 | X Free limit | **50** |
-| **Status** | ✅ Well within limits |
+| **Status** | ✅ Safe |
 
 ---
 
@@ -75,14 +89,11 @@ git push -u origin main
 | `news_bot.py` | Main bot - posts top 3 news in one tweet |
 | `api_client.py` | Test news API separately |
 | `posted_history.json` | Tracks posted articles |
-| `.github/workflows/news_bot.yml` | GitHub Actions config |
+| `.github/workflows/news_bot.yml` | GitHub Actions schedule |
 
-## Manual Run
+## Manual Trigger
 
-```bash
-# Set environment variables first, then:
-python news_bot.py
-```
+Go to [Actions tab](https://github.com/pjob9456/XAutomation/actions) → "Post News to X" → "Run workflow"
 
 ## License
 
