@@ -1,16 +1,16 @@
-name: News Bot Schedule
+name: Post News to X
 
 on:
   schedule:
-    # Runs at minute 0 past every 2nd hour
+    # Runs every 2 hours at minute 0 (UTC): 00:00, 02:00, 04:00 ...
     - cron: '0 */2 * * *'
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch:  # Allows manual trigger from Actions tab
 
 jobs:
-  run-bot:
+  post-news:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Required to commit back to the repo
+      contents: write # Required to commit back to the repo (if you keep the commit step)
 
     steps:
       - name: Checkout repository
@@ -19,13 +19,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: Run News Bot
+      - name: Run news bot
         env:
           NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
@@ -34,10 +34,10 @@ jobs:
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
         run: python news_bot.py
 
-      - name: Commit and Push History
+      - name: Commit and Push History (optional)
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add posted_history.json
+          git add posted_history.json || true
           # Only commit if there are changes
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update posted history" && git push)
