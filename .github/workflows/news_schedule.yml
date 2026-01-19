@@ -2,9 +2,14 @@ name: News Bot Schedule
 
 on:
   schedule:
-    # Runs at minute 0 past every 2nd hour
-    - cron: '0 */2 * * *'
+    # Runs at minute 0 of every hour
+    - cron: '0 * * * *'
   workflow_dispatch: # Allows manual trigger
+
+# Prevent duplicate runs - cancel any in-progress runs
+concurrency:
+  group: news-bot-posting
+  cancel-in-progress: true
 
 jobs:
   run-bot:
